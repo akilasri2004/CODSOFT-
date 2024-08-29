@@ -1,0 +1,119 @@
+#importing the necessary libraries
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+import matplotlib.pyplot as plt
+import nltk
+import seaborn as sns
+from nltk.corpus import stopwords
+import string
+from nltk.stem import PorterStemmer
+from wordcloud import WordCloud
+from collections import Counter
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB, MultinomialNB, BernoulliNB
+from sklearn.metrics import accuracy_score, precision_score, confusion_matrix
+df = pd.read_csv('/content/spam.csv',encoding='latin-1')
+# Displaying the data
+
+df
+# Consice information of the dataset
+
+df.info()
+# Downloading the stopwords dataset
+
+nltk.download('stopwords')
+column_drop=['Unnamed: 2','Unnamed: 3','Unnamed: 4']
+df.drop(columns=column_drop, inplace=True)
+df
+df[df.duplicated()]
+#Drop duplicated values
+df=df.drop_duplicates()
+df
+df.info()
+# Description of data
+
+df.describe()
+df['v1'].value_counts()
+sns.countplot(data=df, x='v1')
+plt.xlabel('v1')
+plt.ylabel('count')
+plt.title('Distribution of mails')
+plt.show()
+# Convert the "Category" column values to numerical representation(0 for "spam",1 for "ham")
+
+df.loc[df["v1"] == "spam", "Category"] = 0
+df.loc[df["v1"] == "ham", "Category"] = 1
+
+df.head()
+X = df['v2']
+Y = df['Category']
+X
+Y
+
+# Splitting the data into train and test data
+
+X_train,X_test,Y_train,Y_test = train_test_split(X,Y,test_size=0.3, random_state=2)
+print(X.shape)
+print(X_train.shape)
+print(X_test.shape)
+# Create a TF-IDF vectorizer to convert text messages to numerical features
+
+feature_extraction = TfidfVectorizer(min_df=1, stop_words='english',lowercase=True)
+
+# Convert the training and testing text messages into numerical features using TF-IDF
+
+X_train_features = feature_extraction.fit_transform(X_train)
+X_test_features = feature_extraction.transform(X_test)
+
+# Convert the target values into 0 and 1
+
+Y_train = Y_train.astype(int)
+Y_test = Y_test.astype(int)
+print(X_train_features)
+print(Y_train)
+from sklearn.linear_model import LogisticRegression # Import the LogisticRegression class
+
+model = LogisticRegression()
+model.fit(X_train_features,Y_train)
+# Model evaluation
+prediction_on_training_data = model.predict(X_train_features)
+accuracy_on_training_data = accuracy_score(Y_train, prediction_on_training_data)
+
+prediction_on_test_data = model.predict(X_test_features)
+accuracy_on_test_data = accuracy_score(Y_test, prediction_on_test_data)
+
+# Print accuracy
+print('Accuracy on training data: {} %'.format(accuracy_on_training_data * 100))
+print('Accuracy on test data: {} %'.format(accuracy_on_test_data * 100))
+# Test the model with some custom email messages
+
+input_mail = ["Congratulations on your recent achievement! Well done."]
+input_data_features = feature_extraction.transform(input_mail)
+prediction = model.predict(input_data_features)
+
+if (prediction)[0] == 1:
+    print("Ham Mail")
+else:
+    print("Spam Mail")
+# Test the model with some custom email messages
+
+input_mail = ["Congratulations! You have won $10000 from an online game. Click the link to claim your prize now!"]
+input_data_features = feature_extraction.transform(input_mail)
+prediction = model.predict(input_data_features)
+
+if (prediction)[0] == 1:
+    print("Ham Mail")
+else:
+    print("Spam Mail")
+# Data Visualisation - Confusion Matrix
+
+cm = confusion_matrix(Y_test,prediction_on_test_data)
+
+plt.figure(figsize=(8,6))
+sns.heatmap(cm, annot=True, fmt='d',cmap="plasma", cbar=False)
+plt.xlabel("Predicted")
+plt.ylabel('True')
+plt.title("Confusion Matrix")
+plt.show()
