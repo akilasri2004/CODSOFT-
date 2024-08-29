@@ -1,0 +1,123 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from matplotlib import pyplot
+from sklearn.model_selection import cross_val_predict
+from sklearn.metrics import confusion_matrix, classification_report, f1_score, precision_score, recall_score, roc_auc_score, roc_curve
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from lightgbm import LGBMClassifier
+from sklearn.model_selection import train_test_split
+from sklearn import preprocessing
+from sklearn.metrics import accuracy_score,recall_score
+from xgboost import XGBClassifier
+from sklearn.model_selection import KFold
+from sklearn.model_selection import cross_val_score, GridSearchCV
+
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=FutureWarning)
+warnings.filterwarnings("ignore", category=UserWarning)
+
+%config InlineBackend.figure_format = 'retina'
+pd.set_option('display.max_columns', None); pd.set_option('display.max_rows', None);
+df = pd.read_csv("/content/archive.zip", index_col=0)
+df.head()
+# The size of the data set
+df.shape
+df.info()
+df.describe([0.05,0.25,0.50,0.75,0.90,0.95,0.99])
+# Numeric Variables
+numeric_variables = [col for col in df.columns if df[col].dtype != "object"
+                        and df[col].nunique() >11
+                        and col not in "CustomerId"]
+numeric_variables
+df["Exited"].value_counts()
+# Customers leaving the bank
+churn = df.loc[df["Exited"]==1]
+not_churn = df.loc[df["Exited"]==0]
+norn["Tenure"].value_counts().sort_values()t_chu
+churn["Tenure"].value_counts().sort_values()
+not_churn["NumOfProducts"].value_counts().sort_values()
+churn["NumOfProducts"].value_counts().sort_values()
+not_churn["HasCrCard"].value_counts()
+# examining the HasCrCard of the churn group
+churn["HasCrCard"].value_counts()
+not_churn["IsActiveMember"].value_counts()
+# examining the IsActiveMember of the churn group
+churn["IsActiveMember"].value_counts()
+# Frequency of not_churn group according to Geography
+not_churn.Geography.value_counts().sort_values()
+# Frequency of churn group according to Geography
+churn.Geography.value_counts().sort_values()
+# Frequency of not_churn group according to Gender
+not_churn.Gender.value_counts()
+# Frequency of churn group according to Gender
+churn.Gender.value_counts()# Let's examine the credit score of the not_churn group
+not_churn["CreditScore"].describe([0.05,0.25,0.50,0.75,0.90,0.95,0.99])
+# distribution of the Credit Score for not_churn
+pyplot.figure(figsize=(8,6))
+pyplot.xlabel('CreditScore')
+pyplot.hist(not_churn["CreditScore"],bins=15, alpha=0.7, label='Not Churn')
+pyplot.legend(loc='upper right')
+pyplot.show()
+churn["CreditScore"].describe([0.05,0.25,0.50,0.75,0.90,0.95,0.99])
+# distribution of the Credit Score for churn
+pyplot.figure(figsize=(8,6))
+pyplot.xlabel('CreditScore')
+pyplot.hist(churn["CreditScore"],bins=15, alpha=0.8, label='Churn')
+pyplot.legend(loc='upper right')
+pyplot.show()
+# examining the age of the not_churn group
+not_churn["Age"].describe([0.05,0.25,0.50,0.75,0.90,0.95,0.99])
+pyplot.figure(figsize=(8,6))
+pyplot.xlabel('Age')
+pyplot.hist(not_churn["Age"],bins=15, alpha=0.7, label='Not Churn')
+pyplot.legend(loc='upper right')
+pyplot.show()
+churn["Age"].describe([0.05,0.25,0.50,0.75,0.90,0.95,0.99])
+pyplot.figure(figsize=(8,6))
+pyplot.xlabel('Age')
+pyplot.hist(churn["Age"],bins=15, alpha=0.7, label='Churn')
+pyplot.legend(loc='upper right')
+pyplot.show()
+# examining the Balance of the not_churn group
+not_churn["Balance"].describe([0.05,0.25,0.50,0.75,0.90,0.95,0.99])
+# distribution of the Balance for not_churn
+pyplot.figure(figsize=(8,6))
+pyplot.xlabel('Balance')
+pyplot.hist(not_churn["Balance"],bins=15, alpha=0.7, label='Not Churn')
+pyplot.legend(loc='upper right')
+pyplot.show()
+# examining the Balance of the churn group
+churn["Balance"].describe([0.05,0.25,0.50,0.75,0.90,0.95,0.99])
+# distribution of the Balance for churn
+pyplot.figure(figsize=(8,6))
+pyplot.xlabel('Balance')
+pyplot.hist(churn["Balance"],bins=15, alpha=0.7, label='Churn')
+pyplot.legend(loc='upper right')
+pyplot.show()
+# examining the EstimatedSalary of the not_churn group
+not_churn["EstimatedSalary"].describe([0.05,0.25,0.50,0.75,0.90,0.95,0.99])
+# distribution of the Balance for churn
+pyplot.figure(figsize=(8,6))
+pyplot.xlabel('EstimatedSalary')
+pyplot.hist(not_churn["EstimatedSalary"],bins=15, alpha=0.7, label='Not Churn')
+pyplot.legend(loc='upper right')
+pyplot.show()
+
+# examining the EstimatedSalary of the churn group
+churn["EstimatedSalary"].describe([0.05,0.25,0.50,0.75,0.90,0.95,0.99])
+# distribution of the EstimatedSalary for churn
+pyplot.figure(figsize=(8,6))
+pyplot.xlabel('EstimatedSalary')
+pyplot.hist(churn["EstimatedSalary"],bins=15, alpha=0.7, label='Churn')
+pyplot.legend(loc='upper right')
+pyplot.show()
+# # Missing Observation Analysis
+df.isnull().sum()
